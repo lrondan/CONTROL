@@ -22,5 +22,5 @@ Multi-platform implementations: Arduino (embedded), Python (simulation/analysis)
 Distributed under the MIT License. See LICENSE for more information.
 
 # Contact
-Project Maintainer: Luis Alexis Rojas Rondan
-Project Link: https://github.com/lrondan/CONTROL
+ - Project Maintainer: Luis Alexis Rojas Rondan
+ - Project Link: https://github.com/lrondan/CONTROL
