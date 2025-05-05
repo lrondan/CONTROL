@@ -27,7 +27,7 @@ unsigned long cloopTime;
 unsigned long currentTime;
 
 //START HYSTERESIS CONFIG
-const float T_SP = 45.0;  //SETPOINT
+const float T_SP = 40.0;  //SETPOINT
 const float HYSTERESIS = 2.0;  //(+-2)
 //END HYSTERESIS CONFIG
 
@@ -58,7 +58,7 @@ void loop() {
   currentTime = millis();
   if (currentTime >= (cloopTime + 1000)) {
     cloopTime = currentTime;
-    flowRate = (flow_frequency / 7.5);  //YF-S201 MODEL  (L/ min)
+    flowRate = (flow_frequency / 7.5) -2 ;  //YF-S201 MODEL  (L/ min)
     flow_frequency = 0;
     }
   //logic
@@ -68,7 +68,7 @@ void loop() {
   digitalWrite(HEAT1PIN, needsHeating ? HIGH : LOW);
   digitalWrite(COOL1PIN, needsCooling ? HIGH : LOW);
   //PUMP1
-  digitalWrite(PUMP1PIN, (needsCooling || needsHeating) ? HIGH : LOW);
+  digitalWrite(PUMP1PIN, (needsCooling || needsHeating) ? ON : OFF);
   //Serial
   Serial.print("Temp1: "); Serial.print(TEMP_TT1);
   Serial.print(" | Temp2: "); Serial.print(TEMP_TT2);
