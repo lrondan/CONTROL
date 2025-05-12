@@ -3,9 +3,9 @@
 #include <DallasTemperature.h>
 
 // Pines
-#define HEATER_PIN 3
-#define COOLER_PIN 5
-#define PUMP_PIN 7
+#define HEATER_PIN 9
+#define COOLER_PIN 11
+#define PUMP_PIN 6
 #define FLOW_SENSOR 2
 
 // Configuración sensores de temperatura
@@ -14,7 +14,7 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress tempSensor1, tempSensor2;
 
 // Variables PID
-double Setpoint = 50.0;
+double Setpoint = 35.0;
 double Input, Output;
 PID myPID(&Input, &Output, &Setpoint, 2.0, 0.1, 0.5, DIRECT);
 
@@ -48,7 +48,7 @@ void setup() {
   // Interrupción sensor de flujo
   attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), flowISR, FALLING);
   
-  digitalWrite(PUMP_PIN, HIGH); // Activar bomba
+  analogWrite(PUMP_PIN, 0); // Activar bomba
 }
 
 void loop() {
@@ -94,7 +94,7 @@ void controlActuators() {
     analogWrite(HEATER_PIN, map(Output, 0, 100, 0, 255));
     analogWrite(COOLER_PIN, 0);
   } else {
-    analogWrite(COOLER_PIN, map(abs(Output), 0, 100, 0, 255));
+    analogWrite(COOLER_PIN, map(abs(Output), 0, 100, 255, 0));
     analogWrite(HEATER_PIN, 0);
   }
 }

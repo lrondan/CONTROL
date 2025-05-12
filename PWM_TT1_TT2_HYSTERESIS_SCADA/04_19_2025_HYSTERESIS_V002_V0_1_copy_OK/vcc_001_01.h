@@ -10,8 +10,8 @@
   uint8_t ADDR_TT2[8] = {0x28, 0x32, 0xA0, 0x5B, 0x3A, 0x19, 0x01, 0x56}; // Temp sensor TT2
   #define HEAT1PIN     9  // Heater is activated from Arduino UNO pin 9
   #define PUMP1PIN     4  // Pump 1 is activated from Arduino UNO pin 3
-  #define PUMP2PIN     5  // Pump 2 is activated from Arduino UNO pin 5
-  #define COOL1PIN     6  // Fan  1 is activared from Arduino UNO pin 6
+  #define PUMP2PIN     6  // Pump 2 is activated from Arduino UNO pin 5
+  #define COOL1PIN     5  // Fan  1 is activared from Arduino UNO pin 6
   unsigned char FLOW1PIN = 2;  // Read data from flow sensor 1
   #define ONE_WIRE_BUS 8  // 1-Wire two devices in total  --YELLOW 
   //LCD_I2C lcd1(0x27);     // Setup and instance to communicate with LCD

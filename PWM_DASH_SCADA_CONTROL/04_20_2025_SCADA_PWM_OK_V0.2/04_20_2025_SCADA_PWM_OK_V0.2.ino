@@ -8,8 +8,8 @@ OneWire oneWire(ONE_WIRE_BUS);       // Setup OneWire instance
 DallasTemperature sensors(&oneWire); // Pass to DallasTemperature
 
 // PWM Outputs
-const int PUMP_PIN = 3;     // PWM for pump (0-255)
-const int COOLER_PIN = 5;   // PWM for cooler fan (0-255)
+const int PUMP_PIN = 6;     // PWM for pump (0-255)
+const int COOLER_PIN = 11;   // PWM for cooler fan (0-255)
 const int HEATER_PIN = 9;   // Triac control for heater (0-180° phase control)
 
 // Timing

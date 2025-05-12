@@ -7,9 +7,9 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // TRIAC Control
-const int triacPin = 7;  // PWM pin for TRIAC trigger
-float setpoint = 45.0;   // Desired temperature (°C)
-const int fanPin = 9;   // fan COOLER
+const int triacPin = 9;  // PWM pin for TRIAC trigger
+float setpoint = 40.0;   // Desired temperature (°C)
+const int fanPin = 5;   // fan COOLER
 
 
 void setup() {
