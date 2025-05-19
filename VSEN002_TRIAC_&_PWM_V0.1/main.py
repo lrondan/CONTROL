@@ -8,6 +8,8 @@ import threading
 import queue
 import time
 from datetime import datetime
+import pandas as pd
+import random
 
 class SCADAApp(tk.Tk):
     def __init__(self):
@@ -86,6 +88,7 @@ class SCADAApp(tk.Tk):
         self.kd_entry.pack(pady=2)
         
         ttk.Button(control_frame, text="Update PID", command=self.update_pid).pack(pady=10)
+        ttk.Button(control_frame, text="Save Data", command=self.save_data_in_csv).pack(pady=5)
         
         # Botón de emergencia
         ttk.Button(control_frame, text="Emergency Stop", 
@@ -189,6 +192,24 @@ class SCADAApp(tk.Tk):
             
         except Exception as e:
             print(f"Error: {e}")
+
+    def save_data_in_csv(self):
+        random_number = random.randint(1, 1000000)
+        try:
+            data = {
+                'Time': self.time_data,
+                'Temp1': self.temp1_data,
+                'Temp2': self.temp2_data,
+                'FlowRate': self.flow_data,
+                'Heater': self.heater_data,
+                'Cooler': self.cooler_data,
+                'Setpoint': self.setpoint_data
+            }
+            df = pd.DataFrame(data)
+            df.to_csv(f'data_{random_number}.csv', index=False)
+            print("Data saved to data.csv")
+        except Exception as e:
+            print(f"Error saving data: {e}")
     
     def update_ui(self):
         if self.time_data:

@@ -12,7 +12,7 @@ void setupLCD() {
   lcd.print("VSEN-022-002");
   lcd.setCursor(1, 3);
   lcd.print("Process Controller");
-  delay(2000);
+  delay(20);
   lcd.clear();  // clear display
 }
 
@@ -24,19 +24,20 @@ void updateLCD() {
   lcd.setCursor(0, 0);
   lcd.print("TT1:");lcd.print(temp1);
   lcd.setCursor(14, 0);
-  lcd.print("C:"); lcd.print(digitalRead(COOLER_PIN));
+  lcd.print("C:"); lcd.print((Output < 0) ? abs(Output) : 0);
   
   // Line 2
   lcd.setCursor(0, 1);
   lcd.print("TT2:");lcd.print(temp2);
   lcd.setCursor(14, 1);
-  lcd.print("H:"); lcd.print(digitalRead(HEATER_TRIAC));
+  lcd.print("H:"); lcd.print((Output > 0) ? Output : 0);
   
   // Line 3
   lcd.setCursor(0, 2);
   lcd.print("FT1:");lcd.print(flowRate);
   lcd.setCursor(14, 2);
-  lcd.print("P:"); lcd.print(digitalRead(PUMP_PIN));
+  int pump_perc = analogRead(PUMP_PIN);
+  lcd.print("P:"); lcd.print(pump_perc);
   
   //Line 4
   lcd.setCursor(0, 3);
@@ -97,11 +98,6 @@ void setup() {
 
   // traic trigger interupt
   attachInterrupt(digitalPinToInterrupt(ZeroCrossPin), zeroCrossISR, RISING);
-
-  //Realy HIGH level setup
-  digitalWrite(PUMP_PIN, OFF);     // Start off
-  digitalWrite(COOLER_PIN, ON);   // Start off
-  digitalWrite(HEATER_TRIAC, ON); // Start off
 }
 
 void loop() {
@@ -132,22 +128,25 @@ void loop() {
 void controlActuators(){
   // Control cooler (ON-OFF)
   if(Output < 0) {
-    digitalWrite(COOLER_PIN, map(abs(Output), 0, 100, ON, OFF));
+    analogWrite(COOLER_PIN, map(abs(Output), 0, 100, 0, 255));
+    delay(100);
     digitalWrite(HEATER_TRIAC, LOW);
+    delay(100);
   }
   else {
-    digitalWrite(COOLER_PIN, ON);
+    analogWrite(COOLER_PIN, 0);
     // Simple time proportional control for TRIAC
     digitalWrite(HEATER_TRIAC, HIGH);
     delay(100);
   }
   // switch pump only if needs cooling or heating
 
-  if (digitalRead(COOLER_PIN) == 1  || digitalRead(HEATER_TRIAC)== 0){
-    digitalWrite(PUMP_PIN, OFF);
-    //delay(100);
+  if (Output < 0){
+    analogWrite(PUMP_PIN, map((Output), -100, 0, 100, 60));
+    delay(100);
   } else{
-    digitalWrite(PUMP_PIN, ON);
+    analogWrite(PUMP_PIN, map((Output),  0, 100, 200, 255));
+    delay(100);
   }
 }
 void sendData() {
@@ -156,8 +155,9 @@ void sendData() {
   Serial.print(",F:"); Serial.print(flowRate);
   Serial.print(",H:"); Serial.print((Output > 0) ? Output : 0);
   Serial.print(",C:"); Serial.print((Output < 0) ? abs(Output) : 0);
-  //Serial.print(",P:"); Serial.print(digitalRead(PUMP_PIN));
   Serial.print(",S:"); Serial.println(Setpoint);
+  //
+  //Serial.print(Output);
 }
 
 void checkSerial() {
@@ -181,9 +181,9 @@ void checkSerial() {
       myPID.SetTunings(Kp, Ki, Kd);
     }
     else if(cmd == "EMSTOP") {
-      digitalWrite(HEATER_TRIAC, ON);
-      digitalWrite(COOLER_PIN, ON);
-      digitalWrite(PUMP_PIN, ON);
+      digitalWrite(HEATER_TRIAC, LOW);
+      digitalWrite(COOLER_PIN, 0);
+      digitalWrite(PUMP_PIN, 0);
     }
   }
 }
