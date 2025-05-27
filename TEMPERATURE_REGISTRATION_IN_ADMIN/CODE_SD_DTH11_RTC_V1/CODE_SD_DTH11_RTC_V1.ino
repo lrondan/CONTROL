@@ -78,5 +78,5 @@ void loop() {
     Serial.println("Error to write the file");
   }
 
-  delay(6000); // Wait _6_ s between mesuretments
+  delay(60000); // Wait _60_ s between mesuretments
 }
