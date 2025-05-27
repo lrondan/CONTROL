@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Monitoring Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>📊 Monitoring Dashboard</h1>
+            <p>Daily Data - Main Room</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="stats">
+            <div class="stat-card">
+                <h3>Temperature</h3>
+                <p><span>Mean:</span> <span id="temp-mean">-- °C</span></p>
+                <p><span>Median:</span> <span id="temp-median">-- °C</span></p>
+                <p><span>Max/Min:</span> <span id="temp-range">-- °C</span></p>
+            </div>
+            <div class="stat-card">
+                <h3>Humidity</h3>
+                <p><span>Mean:</span> <span id="hum-mean">-- %</span></p>
+                <p><span>Median:</span> <span id="hum-median">-- %</span></p>
+                <p><span>Max/Min:</span> <span id="hum-range">-- %</span></p>
+            </div>
+        </section>
+
+        <section class="charts">
+            <div class="chart-container">
+                <canvas id="tempChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="humChart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 Corporate Inc. | Static Data</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
