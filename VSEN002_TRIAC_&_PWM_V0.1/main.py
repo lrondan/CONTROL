@@ -10,6 +10,7 @@ import time
 from datetime import datetime
 import pandas as pd
 import random
+from tkinter import messagebox
 
 class SCADAApp(tk.Tk):
     def __init__(self):
@@ -88,7 +89,8 @@ class SCADAApp(tk.Tk):
         self.kd_entry.pack(pady=2)
         
         ttk.Button(control_frame, text="Update PID", command=self.update_pid).pack(pady=10)
-        ttk.Button(control_frame, text="Save Data", command=self.save_data_in_csv).pack(pady=5)
+        ttk.Button(control_frame, text="Save Data", command=self.save_data_in_csv).pack(pady=10)
+        ttk.Button(control_frame, text="About", command=self.about).pack(pady=10)
         
         # Botón de emergencia
         ttk.Button(control_frame, text="Emergency Stop", 
@@ -135,7 +137,7 @@ class SCADAApp(tk.Tk):
         self.ax2.set_title("Status of Actuators and Flow")
         self.ax2.set_ylabel("% / L/min")
         self.ax2.grid(True)
-    
+   
     def get_ports(self):
         ports = serial.tools.list_ports.comports()
         return [port.device for port in ports]
@@ -206,11 +208,17 @@ class SCADAApp(tk.Tk):
                 'Setpoint': self.setpoint_data
             }
             df = pd.DataFrame(data)
-            df.to_csv(f'data_{random_number}.csv', index=False)
+            file_name = f'data_{random_number}.csv'
+            df.to_csv(f'{file_name}', index=False)
+            messagebox.showinfo("Data Saved", f"Data saved to {file_name}")
             print("Data saved to data.csv")
         except Exception as e:
+            messagebox.showerror("Error", f"Error saving data: {e}")
             print(f"Error saving data: {e}")
     
+    def about(self):
+        messagebox.showinfo("About", "SCADA System - VSEN022\nVersion 1.0\nVanguard Community College\nDeveloped by: Luis Alexis Rojas Rondan\nEmail: lrondan1126@gmail.com")
+                            
     def update_ui(self):
         if self.time_data:
             # Actualizar gráficos
@@ -264,17 +272,20 @@ class SCADAApp(tk.Tk):
                     time.sleep(0.1)
                 
             except ValueError:
-                print("Error: Valores inválidos")
+                messagebox.showerror("Input Error", "Please enter valid numeric values for PID parameters.")
+                print("Error: Invalid PID values")
     
     def emergency_stop(self):
         if self.serial_connection and self.serial_connection.is_open:
             self.serial_connection.write(b"EMSTOP\n")
+            messagebox.showinfo("Emergency Stop", "Emergency stop command sent to the system.")
     
     def on_close(self):
         self.running = False
         if self.serial_connection and self.serial_connection.is_open:
             self.serial_connection.close()
         self.destroy()
+        messagebox.showinfo("Exit", "Closing the SCADA application.")
 
 if __name__ == "__main__":
     app = SCADAApp()
