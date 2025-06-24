@@ -17,20 +17,20 @@ DallasTemperature sensors(&oneWire);
 
 const byte FLOW_SENSOR  = 2;          // Flow sensor
 const byte HEATER_TRIAC = 9;        // Heater is activated from Arduino UNO pin 9
-const byte PUMP_PIN     = 5;          // Pump   is activated from Arduino UNO pin 5
-const byte COOLER_PIN   = 6;          // Fan    is activared from Arduino UNO pin 6
+const byte PUMP_PIN     = 6;          // Pump   is activated from Arduino UNO pin 5
+const byte COOLER_PIN   = 5;          // Fan    is activared from Arduino UNO pin 6
 volatile int ZeroCrossPin = 3;      // INT0, send intrps to triac
 volatile bool zero_cross = false;   // flag down
-int power = 50;                     // Level of heater (50%)
+int power = 32;                     // Level of heater (50%)
 int delay_Time = 0;
 double temp1 = 0;                   // Temp in Process Vessel
 double temp2 = 0;                   // Temp after heat exchanger
 unsigned long StartTime;
 
 // PID Variables
-double Setpoint = 40.0; // Default setpoint
+double Setpoint = 35.0; // Default setpoint
 double Input, Output;
-double Kp=4.0, Ki=0.2, Kd=1.0;
+double Kp=6.0, Ki=0.3, Kd=1.5;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
 // Flow sensor variables
@@ -39,7 +39,3 @@ float flowRate = 0.0;
 unsigned long oldTime;
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);  // I2C (0x27 o 0x3F)
-
-//Config for relays
-#define ON  LOW
-#define OFF HIGH

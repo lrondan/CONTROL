@@ -12,7 +12,7 @@ void setupLCD() {
   lcd.print("VSEN-022-002");
   lcd.setCursor(1, 3);
   lcd.print("Process Controller");
-  delay(20);
+  delay(2000);  // 2s
   lcd.clear();  // clear display
 }
 
@@ -121,12 +121,16 @@ void loop() {
     
     // Send data to SCADA
     sendData();
+
+    //Write data from python file
+    checkSerial();
     
     lastPID = millis();
   }
 }
 void controlActuators(){
-  // Control cooler (ON-OFF)
+  // Control cooler (PWM)
+  // Control heater (TRIAC)
   if(Output < 0) {
     analogWrite(COOLER_PIN, map(abs(Output), 0, 100, 0, 255));
     delay(100);
@@ -135,20 +139,19 @@ void controlActuators(){
   }
   else {
     analogWrite(COOLER_PIN, 0);
-    // Simple time proportional control for TRIAC
     digitalWrite(HEATER_TRIAC, HIGH);
     delay(100);
   }
-  // switch pump only if needs cooling or heating
 
-  if (Output < 0){
-    analogWrite(PUMP_PIN, map((Output), -100, 0, 100, 60));
-    delay(100);
-  } else{
-    analogWrite(PUMP_PIN, map((Output),  0, 100, 200, 255));
-    delay(100);
+  // switch pump for to work in 50% and 100% depends of the difference of the temperatures
+  float diff = temp2 - temp1;
+  if (diff < Setpoint) {
+    analogWrite(PUMP_PIN, 125);  // PWM 50%
+  } else {
+    analogWrite(PUMP_PIN, 250);   // PWM 100%
   }
 }
+
 void sendData() {
   Serial.print("T1:"); Serial.print(sensors.getTempC(sensor1));
   Serial.print(",T2:"); Serial.print(sensors.getTempC(sensor2));
@@ -156,8 +159,6 @@ void sendData() {
   Serial.print(",H:"); Serial.print((Output > 0) ? Output : 0);
   Serial.print(",C:"); Serial.print((Output < 0) ? abs(Output) : 0);
   Serial.print(",S:"); Serial.println(Setpoint);
-  //
-  //Serial.print(Output);
 }
 
 void checkSerial() {

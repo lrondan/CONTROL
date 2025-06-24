@@ -1,6 +1,6 @@
 #include <SimpleDHT.h>
 
-#define DHT_PIN 4  // The pin connected to DHT11 data line
+#define DHT_PIN 9  // The pin connected to DHT11 data line
 
 SimpleDHT11 dht11(DHT_PIN);
 

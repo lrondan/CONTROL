@@ -1,17 +1,17 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-OneWire oneWire(8);  // Setup an instance to communicate with any 1-Wire devices
+OneWire oneWire(6);  // Setup an instance to communicate with any 1-Wire devices
 DallasTemperature sensors(&oneWire);
 
-DeviceAddress sensor1 = {0x28, 0x81, 0x8E, 0x53, 0x3A, 0x19, 0x01, 0x4E}; // Temp sensor address
+DeviceAddress sensor1 = {0x28, 0x94, 0x9F, 0x73, 0x3A, 0x19, 0x01, 0x3F}; // Temp sensor address
 
 void setup() {
   Serial.begin(9600);
   sensors.begin();
     if(!sensors.getAddress(sensor1, 0)) {
     Serial.println("Error: Check sensor connections!");
-    while(0);  //don't forget change to while(1)
+    while(1);  //don't forget change to while(1)
   }
 }
 

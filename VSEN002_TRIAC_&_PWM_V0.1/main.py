@@ -256,7 +256,7 @@ class SCADAApp(tk.Tk):
                     f"SETP:{setpoint}",
                     f"KP:{kp}",
                     f"KI:{ki}",
-                    f"KD:{kd}"
+                    f"KD:{kd}",
                 ]
                 
                 for cmd in commands:
