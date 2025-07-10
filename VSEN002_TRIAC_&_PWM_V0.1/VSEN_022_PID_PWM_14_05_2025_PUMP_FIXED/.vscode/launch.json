@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/user/Desktop/CONTROL/VSEN002_TRIAC_&_PWM_V0.1/VSEN_022_PID_PWM_14_05_2025_PUMP_FIXED",
+      "program": "c:/Users/user/Desktop/CONTROL/VSEN002_TRIAC_&_PWM_V0.1/VSEN_022_PID_PWM_14_05_2025_PUMP_FIXED/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
