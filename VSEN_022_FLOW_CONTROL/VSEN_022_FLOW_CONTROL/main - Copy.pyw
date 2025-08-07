@@ -34,6 +34,7 @@ class SCADAApp(tk.Tk):
         self.heater_data = []
         self.cooler_data = []
         self.setpoint_data = []
+        self.pump_speed = []
         
         # Interfaz
         self.create_widgets()
@@ -114,6 +115,9 @@ class SCADAApp(tk.Tk):
         
         self.cooler_label = ttk.Label(status_frame, text="Cooler: --%")
         self.cooler_label.pack(pady=5)
+
+        self.pump_label = ttk.Label(status_frame, text="Pump: --")
+        self.pump_label.pack(pady=5)
         
         self.setpoint_label = ttk.Label(status_frame, text="Setpoint: --.- °C")
         self.setpoint_label.pack(pady=5)
@@ -183,12 +187,13 @@ class SCADAApp(tk.Tk):
             self.heater_data.append(float(values['H']))
             self.cooler_data.append(float(values['C']))
             self.setpoint_data.append(float(values['S']))
-            
-            # Limitar datos a 50 puntos
-            max_points = 50
+            self.pump_speed.append(float(values['P']))
+
+            # Limitar datos a 10000 puntos
+            max_points = 10000
             for data_list in [self.time_data, self.temp1_data, self.temp2_data, 
                              self.flow_data, self.heater_data, self.cooler_data,
-                             self.setpoint_data]:
+                             self.setpoint_data, self.pump_speed]:
                 if len(data_list) > max_points:
                     data_list.pop(0)
             
@@ -205,7 +210,8 @@ class SCADAApp(tk.Tk):
                 'FlowRate': self.flow_data,
                 'Heater': self.heater_data,
                 'Cooler': self.cooler_data,
-                'Setpoint': self.setpoint_data
+                'Setpoint': self.setpoint_data,
+                'PumpSpeed': self.pump_speed
             }
             df = pd.DataFrame(data)
             file_name = f'data_{random_number}.csv'
@@ -231,24 +237,29 @@ class SCADAApp(tk.Tk):
             self.ax1.plot(self.time_data, self.setpoint_data, 'k--', label='Setpoint')
             self.ax1.legend()
             self.ax1.set_ylabel("°C")
+            self.ax1.set_title("Temperatures")
             self.ax1.grid(True)
             
             # Gráfico de actuadores y flujo
-            self.ax2.plot(self.time_data, self.heater_data, 'r', label='Calentador')
-            self.ax2.plot(self.time_data, self.cooler_data, 'b', label='Enfriador')
-            self.ax2.plot(self.time_data, self.flow_data, 'g', label='Flujo')
+            self.ax2.plot(self.time_data, self.heater_data, 'r', label='Heater')
+            self.ax2.plot(self.time_data, self.cooler_data, 'b', label='Cooler')
+            self.ax2.plot(self.time_data, self.flow_data, 'g', label='Flow Rate')
+            #self.ax2.plot(self.time_data, self.pump_speed, 'm', label='Pump Speed')
             self.ax2.legend()
+            self.ax2.set_title("Status of Actuators and Flow")
+            self.ax2.set_xlabel("Time")
             self.ax2.grid(True)
             
             self.canvas.draw()
             
             # Actualizar etiquetas
-            self.temp1_label.config(text=f"Temp1: {self.temp1_data[-1]:.1f} °C")
-            self.temp2_label.config(text=f"Temp2: {self.temp2_data[-1]:.1f} °C")
-            self.flow_label.config(text=f"Flujo: {self.flow_data[-1]:.1f} L/min")
-            self.heater_label.config(text=f"Calentador: {self.heater_data[-1]:.1f}%")
-            self.cooler_label.config(text=f"Enfriador: {self.cooler_data[-1]:.1f}%")
+            self.temp1_label.config(text=f"Temperature-1: {self.temp1_data[-1]:.1f} °C")
+            self.temp2_label.config(text=f"Temperature-2: {self.temp2_data[-1]:.1f} °C")
+            self.flow_label.config(text=f"FlowRate: {self.flow_data[-1]:.1f} L/min")
+            self.heater_label.config(text=f"Heater: {self.heater_data[-1]:.1f}%")
+            self.cooler_label.config(text=f"Cooler: {self.cooler_data[-1]:.1f}%")
             self.setpoint_label.config(text=f"Setpoint: {self.setpoint_data[-1]:.1f} °C")
+            self.pump_label.config(text=f"Pump: {self.pump_speed[-1]:.1f}")
         
         self.after(1000, self.update_ui)
     

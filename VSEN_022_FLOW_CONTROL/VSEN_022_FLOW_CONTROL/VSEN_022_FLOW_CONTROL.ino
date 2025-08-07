@@ -36,8 +36,8 @@ void updateLCD() {
   lcd.setCursor(0, 2);
   lcd.print("FT1:");lcd.print(flowRate);
   lcd.setCursor(14, 2);
-  int pump_perc = analogRead(PUMP_PIN);
-  lcd.print("P:"); lcd.print(pump_perc);
+  int pump_value = map(FOutput, -100, 100, 255, 0);
+  lcd.print("P:"); lcd.print(pump_value);
   
   //Line 4
   lcd.setCursor(0, 3);
@@ -60,19 +60,7 @@ void zeroCrossISR(){
   zero_cross = false;
 }
 
-void pulseCounter(){
-  pulseCount++;
-}
-
-void calculateFlow() {
-  if(millis() - oldTime > 1000) {
-    detachInterrupt(FLOW_SENSOR);
-    flowRate = ((pulseCount * 2.25) / 70.0 ) - 4; // Calibration factor for YF-S201
-    pulseCount = 0;
-    oldTime = millis();
-    attachInterrupt(FLOW_SENSOR, pulseCounter, FALLING);
-  }
-}
+void pulseCounter(){pulseCount++;}
 
 void setup() {
   setupLCD();  // start LCD
@@ -82,9 +70,13 @@ void setup() {
     Serial.println("Error: Check sensor connections!");
     while(0);  //don't forget change to while(1)
   }
-  // PID Setup
+  // PID Setup TEMPERATURE
   myPID.SetMode(AUTOMATIC);
   myPID.SetOutputLimits(-100, 100);
+
+  // PID FLOW
+  FPID.SetMode(AUTOMATIC);
+  FPID.SetOutputLimits(-100, 100);
   
   // Pin modes
   pinMode(COOLER_PIN, OUTPUT);
@@ -94,18 +86,33 @@ void setup() {
   pinMode(FLOW_SENSOR, INPUT_PULLUP);
 
   //Flow sensor interupt
-  attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, FALLING);
+  attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, RISING);
+  lastTime = millis();
 
   // traic trigger interupt
   attachInterrupt(digitalPinToInterrupt(ZeroCrossPin), zeroCrossISR, RISING);
 }
 
+void calculateFlow() {
+  unsigned long currentTime = millis();
+  if(currentTime - lastTime >= 500) {
+    detachInterrupt(digitalPinToInterrupt(FLOW_SENSOR));
+    int count = pulseCount;
+    pulseCount = 0;
+    attachInterrupt(digitalPinToInterrupt(FLOW_SENSOR), pulseCounter, RISING);
+    flowRate = (count / 23.0) -4; // Calibration factor for GR-301
+    lastTime = currentTime;
+  }
+}
+
+
+
 void loop() {
   updateLCD();  // update
-  delay(1000);  // wait 1 sec between updates
+  delay(500);  // wait 500 Msec between updates
   static unsigned long lastPID = millis();
 
-    if(millis() - lastPID >= 1000) {
+    if(millis() - lastPID >= 500) {
     // Read temperatures
     sensors.requestTemperatures();
     temp1 = sensors.getTempC(sensor1);
@@ -131,6 +138,7 @@ void loop() {
 void controlActuators(){
   // Control cooler (PWM)
   // Control heater (TRIAC)
+  // Control pump (PWM)
   if(Output < 0) {
     analogWrite(COOLER_PIN, map(abs(Output), 0, 100, 0, 255));
     delay(100);
@@ -142,14 +150,9 @@ void controlActuators(){
     digitalWrite(HEATER_TRIAC, HIGH);
     delay(100);
   }
-
-  // switch pump for to work in 50% and 100% depends of the difference of the temperatures
-  float diff = temp2 - temp1;
-  if (diff < Setpoint) {
-    analogWrite(PUMP_PIN, 125);  // PWM 50%
-  } else {
-    analogWrite(PUMP_PIN, 250);   // PWM 100%
-  }
+  FInput = flowRate;
+  FPID.Compute();
+  analogWrite(PUMP_PIN,map(abs(FOutput), -100, 100, 0, 255));
 }
 
 void sendData() {
@@ -158,7 +161,9 @@ void sendData() {
   Serial.print(",F:"); Serial.print(flowRate);
   Serial.print(",H:"); Serial.print((Output > 0) ? Output : 0);
   Serial.print(",C:"); Serial.print((Output < 0) ? abs(Output) : 0);
-  Serial.print(",S:"); Serial.println(Setpoint);
+  Serial.print(",S:"); Serial.print(Setpoint);
+  int pump_value = map(FOutput, -100, 100, 255, 0);
+  Serial.print(",P:"); Serial.println(pump_value);
 }
 
 void checkSerial() {

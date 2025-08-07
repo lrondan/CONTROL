@@ -5,27 +5,23 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from datetime import datetime
 
-# Configuración del puerto
 PORT = 'COM8'
 BAUDRATE = 9600
 
-# Abrir puerto serial
-ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-time.sleep(2)  # Esperar a que el Arduino se inicialice
 
-# Crear archivo CSV
+ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+time.sleep(2)  
+
 csv_file = open('temperaturas.csv', mode='w', newline='')
 csv_writer = csv.writer(csv_file)
 csv_writer.writerow(['Time', 'Temperature1 (°C)', 'Temperature2 (°C)'])
 
-# Inicialización de listas para graficar
 tiempos = []
 temps1 = []
 temps2 = []
 
 start_time = time.time()
 
-# Crear gráfico
 fig, ax = plt.subplots()
 line1, = ax.plot([], [], label='Sensor 1')
 line2, = ax.plot([], [], label='Sensor 2')
@@ -48,12 +44,10 @@ def update(frame):
             temps1.append(temp1)
             temps2.append(temp2)
 
-            # Guardar en CSV
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             csv_writer.writerow([timestamp, temp1, temp2])
             csv_file.flush()
 
-            # Actualizar gráfico
             line1.set_data(tiempos, temps1)
             line2.set_data(tiempos, temps2)
             ax.relim()
